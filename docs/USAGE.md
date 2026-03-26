@@ -4,7 +4,7 @@
 
 ```bash
 # Gateway management
-oc-start         # Start OpenClaw gateway
+oc-start         # Start OpenCode gateway
 oc-stop          # Stop gateway
 oc-status        # Check gateway status
 oc-dashboard     # Open web UI (localhost:18789)
@@ -24,7 +24,7 @@ oc-recon         # Spawn recon sub-agent
 
 1. **Boot from USB** - Select "Live USB Persistence"
 2. **Login** - `kali` / `kali`
-3. **Run setup** - `bash ~/openclaw-setup.sh`
+3. **Run setup** - `bash ~/opencode-setup.sh`
 4. **Start gateway** - `oc-start`
 
 ---
@@ -54,7 +54,7 @@ write path="memory/network-recon-$(date +%Y-%m-%d).md" content="Findings..."
 
 ```bash
 # Browser automation
-browser action=snapshot profile=openclaw
+browser action=snapshot profile=opencode
 browser action=navigate targetUrl="https://target.com"
 
 # Directory enumeration
@@ -74,16 +74,16 @@ write path="memory/web-audit-$(date +%Y-%m-%d).md" content="..."
 bash run-node.sh  # From deployment package
 
 # On your USB gateway
-openclaw nodes pending
-openclaw nodes approve <requestId>
+opencode nodes pending
+opencode nodes approve <requestId>
 
 # Verify
-openclaw nodes status
+opencode nodes status
 
 # Run commands remotely
-openclaw nodes run --node "Target-Box" -- nmap -sV 192.168.1.0/24
-openclaw nodes camera snap --node "Target-Box"
-openclaw nodes screen record --node "Target-Box" --duration 30s
+opencode nodes run --node "Target-Box" -- nmap -sV 192.168.1.0/24
+opencode nodes camera snap --node "Target-Box"
+opencode nodes screen record --node "Target-Box" --duration 30s
 ```
 
 ### Multi-Agent Coordination
@@ -109,7 +109,7 @@ sessions_history --sessionKey "$AGENT1"
 
 ## Templates
 
-Located in `~/.openclaw/workspace/templates/`:
+Located in `~/.opencode/workspace/templates/`:
 
 - **recon-network.md** - Network reconnaissance workflow
 - **recon-web.md** - Web application testing
@@ -158,7 +158,7 @@ EOF
 ~/backup-config.sh user@vps:/backups/
 
 # Manual rsync
-rsync -avz ~/.openclaw/workspace user@vps:/backups/openclaw-workspace/
+rsync -avz ~/.opencode/workspace user@vps:/backups/opencode-workspace/
 ```
 
 ---
@@ -190,13 +190,13 @@ rsync -avz ~/.openclaw/workspace user@vps:/backups/openclaw-workspace/
 ### Gateway won't start
 ```bash
 # Check if already running
-pgrep -f "openclaw"
+pgrep -f "opencode"
 
 # Check port availability
 netstat -tlnp | grep 18789
 
 # Check logs
-tail -f ~/.openclaw/logs/*.log
+tail -f ~/.opencode/logs/*.log
 ```
 
 ### Persistence not saving
@@ -211,10 +211,10 @@ cat /persistence/persistence.conf  # Should be: "/ union"
 ### Tools not in allowlist
 ```bash
 # View current allowlist
-openclaw approvals allowlist list
+opencode approvals allowlist list
 
 # Add missing tool
-openclaw approvals allowlist add --node localhost "/usr/bin/tool-name"
+opencode approvals allowlist add --node localhost "/usr/bin/tool-name"
 ```
 
 ### Node won't connect
@@ -236,7 +236,7 @@ ping <gateway-ip>
 ### Quick Status Check
 ```bash
 # Add to .bashrc for auto-status
-alias oc-check='openclaw status && openclaw nodes status'
+alias oc-check='opencode status && opencode nodes status'
 ```
 
 ### Auto-Document Commands
@@ -261,8 +261,8 @@ script -a session.log
 ### Emergency Cleanup
 ```bash
 # Quick clear of sensitive data
-find ~/.openclaw/workspace -name "*.txt" -delete
-find ~/.openclaw/workspace -name "*.log" -delete
+find ~/.opencode/workspace -name "*.txt" -delete
+find ~/.opencode/workspace -name "*.log" -delete
 shred -u memory/*.md  # Secure delete
 ```
 
@@ -278,16 +278,52 @@ When using the web dashboard at `localhost:18789`:
 
 ---
 
+## CLI Agent (Offline AI)
+
+CLI Agent works with local models via Ollama:
+
+```bash
+# Install CLI Agent (if not installed)
+cd ~/cli-agent && pip install -e .
+
+# Start with cloud API
+agent chat --model deepseek:deepseek-chat
+
+# Start with local Ollama (no internet needed!)
+agent chat --model ollama:llama3
+
+# List available models
+agent switch --list
+```
+
+## Ollama Setup (Local Models)
+
+```bash
+# Install Ollama
+curl -fsSL https://ollama.com/install.sh | bash
+
+# Pull models
+ollama pull llama3
+ollama pull codellama
+ollama pull mistral
+
+# Use with CLI Agent
+agent chat --model ollama:llama3
+```
+
 ## Getting Help
 
 ```bash
-# OpenClaw help
-openclaw --help
-openclaw <command> --help
+# OpenCode help
+opencode --help
+opencode <command> --help
 
-# Check documentation
-openclaw docs
+# CLI Agent help
+agent --help
+
+# Ollama help
+ollama --help
 
 # Community support
-# Discord: https://discord.gg/clawd
+# Discord: https://discord.gg/opencode
 ```

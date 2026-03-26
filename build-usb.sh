@@ -1,8 +1,8 @@
 #!/bin/bash
 ################################################################################
-# Kali + OpenClaw Portable Pentest USB Builder
+# Kali + OpenCode Portable Pentest USB Builder
 # 
-# Creates a bootable Kali Live USB with persistence + pre-configured OpenClaw
+# Creates a bootable Kali Live USB with persistence + pre-configured OpenCode
 # for automated penetration testing workflows.
 #
 # Usage: sudo ./build-usb.sh /dev/sdX
@@ -25,7 +25,7 @@ NC='\033[0m' # No Color
 # Configuration
 KALI_ISO_URL="https://http.kali.org/kali-2025.1/kali-linux-2025.1-live-amd64.iso"
 KALI_ISO_SHA256="CHECK_ON_KALI_SITE"
-OPENCLAW_INSTALL_URL="https://openclaw.ai/install.sh"
+OPENCLAW_INSTALL_URL="https://opencode.ai/install.sh"
 
 ################################################################################
 # Helper Functions
@@ -93,7 +93,7 @@ main() {
     check_root
     check_usb_device "$USB_DEVICE"
     
-    log_info "Building Kali + OpenClaw USB on $USB_DEVICE"
+    log_info "Building Kali + OpenCode USB on $USB_DEVICE"
     log_info "This will take 10-20 minutes depending on your internet speed"
     
     # Step 1: Download Kali ISO
@@ -161,30 +161,30 @@ main() {
     
     rmdir "$persist_mount" || true
     
-    # Step 5: Create OpenClaw setup scripts
-    log_info "Step 5/7: Creating OpenClaw setup scripts..."
+    # Step 5: Create OpenCode setup scripts
+    log_info "Step 5/7: Creating OpenCode setup scripts..."
     
     # We'll create these to run after first boot
     mkdir -p "/tmp/usb_postinstall_$$"
     local postinstall_dir="/tmp/usb_postinstall_$$"
     
     # Create the post-install script
-    cat > "$postinstall_dir/openclaw-setup.sh" << 'POSTINSTALL_EOF'
+    cat > "$postinstall_dir/opencode-setup.sh" << 'POSTINSTALL_EOF'
 #!/bin/bash
 ################################################################################
-# OpenClaw Post-Install Setup (runs after first boot into Kali Live)
+# OpenCode Post-Install Setup (runs after first boot into Kali Live)
 ################################################################################
 
 set -euo pipefail
 
 KALI_USER="kali"
-OPENCLAW_HOME="/home/$KALI_USER/.openclaw"
+OPENCLAW_HOME="/home/$KALI_USER/.opencode"
 
-echo "🗡️  Setting up OpenClaw for portable pentesting..."
+echo "🗡️  Setting up OpenCode for portable pentesting..."
 
-# Install OpenClaw
-echo "Installing OpenClaw..."
-curl -fsSL https://openclaw.ai/install.sh | bash
+# Install OpenCode
+echo "Installing OpenCode..."
+curl -fsSL https://opencode.ai/install.sh | bash
 
 # Wait for installation to complete
 sleep 2
@@ -221,14 +221,14 @@ cat > "$OPENCLAW_HOME/workspace/USER.md" << 'EOF'
 
 ## Context
 
-Pentester using portable Kali + OpenClaw rig.
+Pentester using portable Kali + OpenCode rig.
 EOF
 
 # Configure gateway
 echo "Configuring gateway..."
-openclaw config set gateway.bind lan
-openclaw config set gateway.port 18789
-openclaw config set tools.exec.security allowlist
+opencode config set gateway.bind lan
+opencode config set gateway.port 18789
+opencode config set tools.exec.security allowlist
 
 # Create node host template for drop-box deployments
 cat > "$OPENCLAW_HOME/node-templates/dropbox.json" << 'EOF'
@@ -243,46 +243,46 @@ EOF
 
 # Pre-approve common pentest tools
 echo "Pre-approving pentest tools..."
-openclaw approvals allowlist add --node localhost "/usr/bin/nmap"
-openclaw approvals allowlist add --node localhost "/usr/bin/sqlmap"
-openclaw approvals allowlist add --node localhost "/usr/bin/burpsuite"
-openclaw approvals allowlist add --node localhost "/usr/bin/metasploit"
-openclaw approvals allowlist add --node localhost "/usr/bin/hashcat"
-openclaw approvals allowlist add --node localhost "/usr/bin/john"
-openclaw approvals allowlist add --node localhost "/usr/bin/gobuster"
-openclaw approvals allowlist add --node localhost "/usr/bin/nikto"
-openclaw approvals allowlist add --node localhost "/usr/bin/wfuzz"
-openclaw approvals allowlist add --node localhost "/usr/bin/dirb"
-openclaw approvals allowlist add --node localhost "/usr/bin/hydra"
-openclaw approvals allowlist add --node localhost "/usr/bin/netcat"
-openclaw approvals allowlist add --node localhost "/bin/bash"
+opencode approvals allowlist add --node localhost "/usr/bin/nmap"
+opencode approvals allowlist add --node localhost "/usr/bin/sqlmap"
+opencode approvals allowlist add --node localhost "/usr/bin/burpsuite"
+opencode approvals allowlist add --node localhost "/usr/bin/metasploit"
+opencode approvals allowlist add --node localhost "/usr/bin/hashcat"
+opencode approvals allowlist add --node localhost "/usr/bin/john"
+opencode approvals allowlist add --node localhost "/usr/bin/gobuster"
+opencode approvals allowlist add --node localhost "/usr/bin/nikto"
+opencode approvals allowlist add --node localhost "/usr/bin/wfuzz"
+opencode approvals allowlist add --node localhost "/usr/bin/dirb"
+opencode approvals allowlist add --node localhost "/usr/bin/hydra"
+opencode approvals allowlist add --node localhost "/usr/bin/netcat"
+opencode approvals allowlist add --node localhost "/bin/bash"
 
 # Create bash aliases for quick access
 cat >> "/home/$KALI_USER/.bashrc" << 'EOF'
 
 # ═══════════════════════════════════════════════════════════
-# OpenClaw Portable Pentest Rig - Quick Commands
+# OpenCode Portable Pentest Rig - Quick Commands
 # ═══════════════════════════════════════════════════════════
 
-alias oc-start='openclaw gateway start'
-alias oc-stop='openclaw gateway stop'
-alias oc-status='openclaw status'
-alias oc-dashboard='openclaw dashboard'
-alias oc-nodes='openclaw nodes status'
-alias oc-approve='openclaw nodes approve'
-alias oc-pending='openclaw nodes pending'
+alias oc-start='opencode gateway start'
+alias oc-stop='opencode gateway stop'
+alias oc-status='opencode status'
+alias oc-dashboard='opencode dashboard'
+alias oc-nodes='opencode nodes status'
+alias oc-approve='opencode nodes approve'
+alias oc-pending='opencode nodes pending'
 
 # Quick pentest workflows
-alias oc-recon='cd ~/.openclaw/workspace && sessions_spawn --runtime subagent --task "Network reconnaissance"'
-alias oc-docs='cd ~/.openclaw/workspace/memory && ls -la'
+alias oc-recon='cd ~/.opencode/workspace && sessions_spawn --runtime subagent --task "Network reconnaissance"'
+alias oc-docs='cd ~/.opencode/workspace/memory && ls -la'
 
 # Auto-check gateway status
 check_oc() {
-    if ! pgrep -f "openclaw.*gateway" > /dev/null 2>&1; then
-        echo "🗡️  OpenClaw gateway not running. Start with: oc-start"
+    if ! pgrep -f "opencode.*gateway" > /dev/null 2>&1; then
+        echo "🗡️  OpenCode gateway not running. Start with: oc-start"
         return 1
     fi
-    echo "✅ OpenClaw gateway running"
+    echo "✅ OpenCode gateway running"
     return 0
 }
 
@@ -322,7 +322,7 @@ nmap --script vuln -oN vulns.txt <target>
 nmap -sU -T4 -oN udp-scan.txt <target>
 ```
 
-## OpenClaw Automation
+## OpenCode Automation
 
 ```bash
 # Spawn recon sub-agent
@@ -374,11 +374,11 @@ sqlmap -u "<url>" --batch --level=3 --risk=2 -o sqlmap.txt
 xsstrike -u "<url>"
 ```
 
-## OpenClaw Browser Automation
+## OpenCode Browser Automation
 
 ```bash
 # Capture screenshot
-browser action=snapshot profile=openclaw
+browser action=snapshot profile=opencode
 
 # Navigate and test
 browser action=navigate targetUrl="<url>"
@@ -429,24 +429,24 @@ EOF
 # Create backup script
 cat > "$OPENCLAW_HOME/workspace/backup-config.sh" << 'EOF'
 #!/bin/bash
-# Backup OpenClaw configuration
+# Backup OpenCode configuration
 
 TIMESTAMP=$(date +%Y%m%d-%H%M%S)
-BACKUP_DIR="$HOME/.openclaw/workspace/backups/openclaw-$TIMESTAMP"
+BACKUP_DIR="$HOME/.opencode/workspace/backups/opencode-$TIMESTAMP"
 
 mkdir -p "$BACKUP_DIR"
-cp -r ~/.openclaw "$BACKUP_DIR/"
+cp -r ~/.opencode "$BACKUP_DIR/"
 
 echo "✅ Backup saved to: $BACKUP_DIR"
 
 # Optional: sync to remote
-# rsync -avz "$BACKUP_DIR" user@vps:/backups/openclaw/
+# rsync -avz "$BACKUP_DIR" user@vps:/backups/opencode/
 EOF
 chmod +x "$OPENCLAW_HOME/workspace/backup-config.sh"
 
 # Create README for the workspace
 cat > "$OPENCLAW_HOME/workspace/README.md" << 'EOF'
-# 🗡️ OpenClaw Portable Pentest Workspace
+# 🗡️ OpenCode Portable Pentest Workspace
 
 This workspace contains pre-configured templates and workflows for penetration testing.
 
@@ -481,7 +481,7 @@ EOF
 
 # Final instructions
 echo ""
-echo "✅ OpenClaw setup complete!"
+echo "✅ OpenCode setup complete!"
 echo ""
 echo "Quick commands:"
 echo "  oc-start      - Start gateway"
@@ -489,12 +489,12 @@ echo "  oc-status     - Check status"
 echo "  oc-dashboard  - Open web UI"
 echo "  oc-nodes      - List connected nodes"
 echo ""
-echo "Templates available in ~/.openclaw/workspace/templates/"
+echo "Templates available in ~/.opencode/workspace/templates/"
 echo ""
 echo "🗡️  Happy (legal) hacking!"
 POSTINSTALL_EOF
 
-    chmod +x "$postinstall_dir/openclaw-setup.sh"
+    chmod +x "$postinstall_dir/opencode-setup.sh"
     
     # Also create a README on the USB root
     cat > "$postinstall_dir/README-OPENCLAW.txt" << 'EOF'
@@ -509,26 +509,26 @@ BOOT INSTRUCTIONS:
 
 FIRST BOOT SETUP:
 1. Open terminal
-2. Run: sudo bash /postinstall/openclaw-setup.sh
+2. Run: sudo bash /postinstall/opencode-setup.sh
 3. Wait for installation (~2-5 minutes)
 4. Start using: oc-start
 
 QUICK COMMANDS:
-  oc-start      - Start OpenClaw gateway
+  oc-start      - Start OpenCode gateway
   oc-status     - Check gateway status  
   oc-dashboard  - Open web UI (localhost:18789)
   oc-nodes      - List connected nodes
   oc-approve    - Approve pending nodes
 
 TEMPLATES:
-  ~/.openclaw/workspace/templates/
+  ~/.opencode/workspace/templates/
   - recon-network.md
   - recon-web.md
   - recon-wifi.md
 
 BACKUP:
   Run before removing USB:
-  ~/.openclaw/workspace/backup-config.sh
+  ~/.opencode/workspace/backup-config.sh
 
 SECURITY:
   - Only test authorized systems
@@ -549,14 +549,14 @@ EOF
     log_info "Step 6/7: Creating documentation..."
     
     cat > "$postinstall_dir/USB-BUILD-README.md" << 'EOF'
-# Kali + OpenClaw Portable Pentest USB
+# Kali + OpenCode Portable Pentest USB
 
 ## What This Is
 
 A bootable USB drive that combines:
 - **Kali Linux Live** - Full pentest toolkit
 - **Persistence** - Your configs survive reboots
-- **OpenClaw** - Automation layer for recon, exploitation, documentation
+- **OpenCode** - Automation layer for recon, exploitation, documentation
 
 ## Why This Exists
 
@@ -572,8 +572,8 @@ This USB solves all of that in one bootable package.
 
 ```bash
 # Clone this repo
-git clone https://github.com/YOURUSERNAME/kali-openclaw-usb.git
-cd kali-openclaw-usb
+git clone https://github.com/YOURUSERNAME/kali-opencode-usb.git
+cd kali-opencode-usb
 
 # Build the USB (REPLACE /dev/sdX with your USB device)
 sudo ./build-usb.sh /dev/sdX
@@ -592,10 +592,10 @@ sudo ./build-usb.sh /dev/sdX
 ### First Boot
 ```bash
 # Run the setup script
-sudo bash /postinstall/openclaw-setup.sh
+sudo bash /postinstall/opencode-setup.sh
 
 # Or if you copied it to home:
-bash ~/openclaw-setup.sh
+bash ~/opencode-setup.sh
 ```
 
 ### Daily Use
@@ -619,18 +619,18 @@ oc-nodes
 ### Deploy Drop-Box Nodes
 ```bash
 # On target network machine
-openclaw node run --host <your-kali-ip> --port 18789
+opencode node run --host <your-kali-ip> --port 18789
 
 # Approve on your Kali gateway
-openclaw nodes approve <requestId>
+opencode nodes approve <requestId>
 
 # Control remotely
-openclaw nodes run --node <name> -- nmap -sV 192.168.1.0/24
+opencode nodes run --node <name> -- nmap -sV 192.168.1.0/24
 ```
 
 ### Backup Before Removing
 ```bash
-~/.openclaw/workspace/backup-config.sh
+~/.opencode/workspace/backup-config.sh
 ```
 
 ## Security Considerations
@@ -661,7 +661,7 @@ openclaw nodes run --node <name> -- nmap -sV 192.168.1.0/24
 │  [EFI Boot]  - Kali bootloader                          │
 │  [Live ISO]  - Read-only Kali base system               │
 │  [Persist]   - Your configs, workspace, keys            │
-│                /home/kali/.openclaw/                     │
+│                /home/kali/.opencode/                     │
 └─────────────────────────────────────────────────────────┘
                           │
                           │ Boot on any x64 machine
@@ -669,7 +669,7 @@ openclaw nodes run --node <name> -- nmap -sV 192.168.1.0/24
 ┌─────────────────────────────────────────────────────────┐
 │              Your Portable Pentest Rig                  │
 │  • Full Kali toolset (nmap, metasploit, burp, etc.)     │
-│  • OpenClaw gateway (automation + orchestration)        │
+│  • OpenCode gateway (automation + orchestration)        │
 │  • Pre-configured workflows                             │
 │  • Auto-documentation                                   │
 │  • Nothing touches host disk                            │
@@ -682,13 +682,13 @@ openclaw nodes run --node <name> -- nmap -sV 192.168.1.0/24
 - Make sure you selected "Live USB Persistence" at boot
 - Check persistence.conf exists: `cat /persistence/persistence.conf`
 
-### OpenClaw won't start
+### OpenCode won't start
 - Check Node.js is installed: `node -v`
-- Reinstall: `curl -fsSL https://openclaw.ai/install.sh | bash`
+- Reinstall: `curl -fsSL https://opencode.ai/install.sh | bash`
 
 ### Gateway won't bind
 - Check port isn't in use: `netstat -tlnp | grep 18789`
-- Change port: `openclaw config set gateway.port 18790`
+- Change port: `opencode config set gateway.port 18790`
 
 ## Contributing
 
@@ -706,7 +706,7 @@ MIT - Do what you want, just don't be evil.
 
 Built with:
 - Kali Linux (https://kali.org)
-- OpenClaw (https://openclaw.ai)
+- OpenCode (https://opencode.ai)
 
 Idea timestamped: 2026-02-26 21:57 CST
 Because good ideas get stolen. 🗡️
@@ -726,10 +726,10 @@ EOF
     echo ""
     echo "1. Boot from USB (select 'Live USB Persistence')"
     echo "2. After first boot, run the setup script:"
-    echo "   sudo bash /postinstall/openclaw-setup.sh"
+    echo "   sudo bash /postinstall/opencode-setup.sh"
     echo ""
     echo "3. Or manually:"
-    echo "   curl -fsSL https://openclaw.ai/install.sh | bash"
+    echo "   curl -fsSL https://opencode.ai/install.sh | bash"
     echo ""
     echo "Post-install scripts are in: $postinstall_dir"
     echo ""

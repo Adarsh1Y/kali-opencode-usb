@@ -54,7 +54,7 @@ read -p "Are you sure? (YES): " confirm
 
 if [[ "$confirm" == "YES" ]]; then
     # Shred sensitive files
-    find ~/.openclaw/workspace -type f -exec shred -u {} \;
+    find ~/.opencode/workspace -type f -exec shred -u {} \;
     
     # Zero free space
     dd if=/dev/zero of=/home/kali/zero.file bs=1M
@@ -79,10 +79,10 @@ By default, the gateway binds to LAN. Consider:
 
 ```bash
 # Bind to localhost only (more secure)
-openclaw config set gateway.bind localhost
+opencode config set gateway.bind localhost
 
 # Or use TLS for remote connections
-openclaw config set gateway.tls true
+opencode config set gateway.tls true
 ```
 
 ### Remote Node Connections
@@ -96,7 +96,7 @@ When deploying nodes on target network:
 
 ```bash
 # Deploy node with TLS
-openclaw node run --host <gateway> --port 18789 --tls --tls-fingerprint <fingerprint>
+opencode node run --host <gateway> --port 18789 --tls --tls-fingerprint <fingerprint>
 ```
 
 ### VPS Gateway (Recommended)
@@ -168,10 +168,10 @@ Only approve tools you actually need:
 
 ```bash
 # View current allowlist
-openclaw approvals allowlist list
+opencode approvals allowlist list
 
 # Remove unused tools
-openclaw approvals allowlist remove --node localhost "/usr/bin/unneeded-tool"
+opencode approvals allowlist remove --node localhost "/usr/bin/unneeded-tool"
 ```
 
 ### Supply Chain
@@ -179,15 +179,15 @@ openclaw approvals allowlist remove --node localhost "/usr/bin/unneeded-tool"
 **Verify installations:**
 
 ```bash
-# Check OpenClaw integrity
-openclaw doctor
+# Check OpenCode integrity
+opencode doctor
 
 # Verify Node.js
 node -v
 npm -v
 
 # Check for unexpected processes
-ps aux | grep -E "(node|openclaw)"
+ps aux | grep -E "(node|opencode)"
 ```
 
 ### Updates
@@ -198,11 +198,11 @@ ps aux | grep -E "(node|openclaw)"
 # Update Kali
 sudo apt update && sudo apt full-upgrade -y
 
-# Update OpenClaw
-openclaw update
+# Update OpenCode
+opencode update
 
 # Update node packages
-npm update -g openclaw
+npm update -g opencode
 ```
 
 ---
@@ -272,7 +272,7 @@ npm update -g openclaw
 ## Resources
 
 - [Kali Security](https://kali.org/docs/)
-- [OpenClaw Security Docs](https://trust.openclaw.ai)
+- [OpenCode Security Docs](https://trust.opencode.ai)
 - [MITRE ATT&CK](https://attack.mitre.org/) - Adversary tactics
 - [PTES](http://www.pentest-standard.org/) - Penetration Testing Execution Standard
 - [OWASP](https://owasp.org/) - Web security guidelines
