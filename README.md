@@ -44,7 +44,7 @@ Traditional pentesting workflow problems:
 
 ```bash
 # Clone this repo
-git clone https://github.com/YOURUSERNAME/kali-opencode-usb.git
+git clone https://github.com/Adarsh1Y/kali-opencode-usb.git
 cd kali-opencode-usb
 
 # Build the USB (REPLACE /dev/sdX with your USB device)
@@ -415,7 +415,7 @@ Built with:
 
 ## 📬 Contact
 
-- **GitHub:** [@YOURUSERNAME](https://github.com/YOURUSERNAME)
+- **GitHub:** [@Adarsh1Y](https://github.com/Adarsh1Y)
 - **OpenCode Discord:** [OpenCode Community](https://discord.gg/opencode)
 - **Twitter:** [@YOURHANDLE]
 
