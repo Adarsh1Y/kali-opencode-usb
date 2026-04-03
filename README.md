@@ -255,7 +255,7 @@ OpenCode is pre-configured with MCP servers and plugins:
 │  • Shannon (autonomous pentesting)                  │
 │  • Nothing touches host disk                        │
 └─────────────────────────────────────────────────────┘
-```
+
 ┌───────────────────────────────────────────────────────┐
 │                    USB Drive                          │
 ├───────────────────────────────────────────────────────┤
@@ -279,7 +279,7 @@ OpenCode is pre-configured with MCP servers and plugins:
 │  • Kali MCP (35+ security tools via AI)               │
 │  • Nothing touches host disk                          │
 └───────────────────────────────────────────────────────┘
-```
+
 
 ---
 
